@@ -1,0 +1,1384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YASH VERMA - Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- tsparticles CDN for animated background -->
+    <script src="https://cdn.jsdelivr.net/npm/tsparticles@2.x/tsparticles.bundle.min.js"></script>
+
+    <style>
+        /* Base body styles for font and background */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0d1117; /* Very dark background */
+            color: #f9fafb; /* Default body text color remains pure white for general readability */
+            overflow-x: hidden; /* Prevent horizontal scroll due to animations */
+            position: relative; /* Needed for z-index context */
+            min-height: 100vh; /* Ensure body takes full height */
+        }
+
+        /* Loading Screen Styles */
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(13, 17, 23, 0.95); /* Semi-transparent dark background */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999; /* Ensure it's on top of everything */
+            transition: opacity 1s ease-out, visibility 1s ease-out; /* Fade out effect */
+        }
+
+        #loading-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        /* Flower Animation Styles */
+        .flower-loader {
+            position: relative;
+            width: 80px; /* Size of the flower */
+            height: 80px;
+            margin-bottom: 20px;
+            animation: rotateFlower 8s linear infinite; /* Overall flower rotation */
+        }
+
+        /* Flower Loader Aura/Background Effect (Similar to flower_Leafs) */
+        .flower-loader::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%); /* Centered relative to flower-loader */
+            width: 8vmin; /* Relative to viewport height for responsiveness */
+            height: 8vmin;
+            background-color: #6bf0ff; /* Light blue as requested */
+            filter: blur(10vmin); /* Corrected blur syntax, increased blur for strong aura */
+            border-radius: 50%; /* Make it a circular glow */
+            opacity: 0.7; /* Initial opacity */
+            z-index: -1; /* Behind the petals and center */
+            animation: glowPulse 2s ease-in-out infinite alternate; /* New animation for the glow */
+        }
+
+        @keyframes glowPulse {
+            0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.5; }
+            100% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.8; }
+        }
+
+        .flower-loader .petal-group {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.8; /* Slight transparency */
+            animation: pulsePetal 2s ease-in-out infinite alternate; /* Petal pulsation */
+        }
+
+        .flower-loader .petal {
+            position: absolute;
+            width: 40px; /* Petal width */
+            height: 40px; /* Petal height */
+            background-color: #3498db; /* Blue petal color */
+            border-radius: 50% 50% 0 50%; /* Creates a petal shape */
+            transform-origin: 0% 0%; /* Rotate around its top-left corner */
+            top: 50%;
+            left: 50%;
+            margin-left: -20px; /* Adjust to center petal */
+            margin-top: -20px; /* Adjust to center petal */
+        }
+
+        .flower-loader .petal:nth-child(1) { transform: rotate(0deg); }
+        .flower-loader .petal:nth-child(2) { transform: rotate(72deg); background-color: #8e44ad; } /* Purple */
+        .flower-loader .petal:nth-child(3) { transform: rotate(144deg); background-color: #2ecc71; } /* Green */
+        .flower-loader .petal:nth-child(4) { transform: rotate(216deg); background-color: #e67e22; } /* Orange */
+        .flower-loader .petal:nth-child(5) { transform: rotate(288deg); background-color: #f1c40f; } /* Yellow */
+
+
+        .flower-loader .center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 25px; /* Center circle size */
+            height: 25px;
+            background-color: #f9fafb; /* White center */
+            border-radius: 50%;
+            z-index: 10; /* Ensure it's above petals */
+        }
+
+
+        @keyframes rotateFlower {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes pulsePetal {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.05); }
+        }
+
+        .loading-text {
+            color: #d1d5db;
+            font-size: 1.25rem;
+            font-weight: 500;
+        }
+
+
+        /* New Animated Background Gradient */
+        .animated-bg-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2; /* Below particles and content */
+            background: linear-gradient(270deg, #1f2f45, #171d2b, #1f2f45);
+            background-size: 600% 600%; /* Larger background for animation */
+            animation: gradientAnimation 20s ease infinite; /* Smooth, continuous animation */
+        }
+
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Particles container */
+        #tsparticles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1; /* Above gradient, below content */
+        }
+
+        /* Custom styling for section headings with an animated underline */
+        .section-heading {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 2rem;
+            font-size: 2.25rem; /* text-4xl */
+            font-weight: 700; /* font-bold */
+            color: #f9fafb; /* White for headings */
+        }
+        .section-heading::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -8px; /* Adjust as needed */
+            width: 0%; /* Start hidden for animation */
+            height: 4px;
+            background-color: #3498db; /* Accent color */
+            border-radius: 9999px; /* Fully rounded */
+            transition: width 0.8s ease-out; /* Smooth transition for width */
+        }
+        /* Animation for section heading underline when visible */
+        .section-heading.is-visible::after {
+            width: 60%; /* Expand to 60% width */
+        }
+        /* Card styling for projects, education, and skills */
+        .card {
+            background: rgba(255, 255, 255, 0.05); /* Very subtle transparency */
+            backdrop-filter: blur(15px) saturate(180%); /* Increased blur */
+            border-radius: 1.5rem; /* rounded-xl */
+            box-shadow: 0 10px 32px 0 rgba(0, 0, 0, 0.25); /* Darker shadow */
+            border: 1px solid rgba(255,255,255,0.08); /* Subtle white border */
+            padding: 2rem;
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+        .card:hover {
+            transform: translateY(-8px) scale(1.03); /* Increased hover effect */
+            box-shadow: 0 20px 40px 0 rgba(52, 152, 219, 0.25); /* Darker, blue-tinged shadow on hover */
+        }
+        /* Primary button styling */
+        .btn-primary {
+            background-color: #3498db; /* Accent color */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem; /* rounded-lg */
+            font-weight: 600; /* font-semibold */
+            transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
+        }
+        .btn-primary:hover {
+            background-color: #2980b9; /* Darker accent */
+            transform: translateY(-2px);
+        }
+
+        /* Social icons container for perspective */
+        .social-icons-container {
+            /* Removed perspective here as it's not strictly needed for this 3D effect,
+               and was causing unintended distortions when combined with other transforms. */
+        }
+
+        /* Social icon styling - REVISED FOR CIRCULARITY & GLOW */
+        .social-icon {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 3rem;
+            height: 3rem;
+            border-radius: 9999px; /* Ensures perfect circle */
+            background-color: rgba(255, 255, 255, 0.1); /* Subtle initial background */
+            color: #3498db; /* Accent color for icon */
+            overflow: visible; /* Changed to visible to ensure blur isn't clipped */
+            z-index: 1; /* Ensures the main icon is above its pseudo-elements */
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3); /* Initial subtle shadow for depth */
+            transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1.27), /* Transform transition */
+                        box-shadow 0.5s cubic-bezier(0.23, 1, 0.32, 1.27), /* Box-shadow transition */
+                        background-color 0.3s ease-in-out; /* Background color transition */
+            /* No initial 3D transforms (rotateX, rotateY) on the main element itself
+               to keep it perfectly circular by default. */
+        }
+
+        .social-icon:hover {
+            background-color: #3498db; /* Darker accent on hover */
+            color: white;
+            /* Levitate, shift right and up, scale, and subtly pop forward on hover */
+            transform: translateY(-10px) translateX(10px) scale(1.1); /* Levitate, shift, and enlarge */
+            box-shadow: 0 5px 25px rgba(0,0,0,0.5); /* Keep a lifted shadow for the main icon */
+        }
+
+        /* Pseudo-elements for glowing "walls" (without visible lines, maintaining circularity) */
+        .social-icon::before,
+        .social-icon::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 9999px; /* Maintain circular shape */
+            background: transparent; /* No background color, purely for shadow effect */
+            transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1.27), opacity 0.5s ease-out, box-shadow 0.5s ease-out;
+            filter: blur(15px); /* Increased blur for a softer, more diffused glow */
+            opacity: 0; /* Start invisible */
+            z-index: -1; /* Always behind the main icon */
+            /* Removed translate here, they will stay centered */
+        }
+
+        .social-icon:hover::before {
+            opacity: 1; /* Fade in on hover */
+            transform: scale(1.2); /* Scale the pseudo-element to create a growing circular glow */
+            box-shadow: 0 0 50px 20px rgba(52, 152, 219, 0.8); /* Stronger, wider blue glow */
+        }
+
+        .social-icon:hover::after {
+            opacity: 1; /* Fade in on hover */
+            transform: scale(1.2); /* Scale the pseudo-element to create a growing circular glow */
+            box-shadow: 0 0 50px 20px rgba(153, 51, 255, 0.7); /* Stronger, wider purple glow */
+        }
+
+
+        /* Custom scrollbar for a cleaner look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #2d3748; /* Darker track */
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4a5568; /* Darker thumb */
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6b7280; /* Even darker on hover */
+        }
+
+        /* --- Animations --- */
+
+        /* Fade-in for sections */
+        .fade-in-section {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .fade-in-section.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Hero section specific animations */
+        .hero-text-animate {
+            animation: slideInFromLeft 1s ease-out forwards;
+        }
+        .hero-image-animate {
+            animation: fadeInScale 1s ease-out forwards;
+            animation-delay: 0.5s; /* Delay image animation */
+            opacity: 0; /* Start hidden */
+        }
+
+        @keyframes slideInFromLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Card specific animation (staggered fade-in) */
+        .animated-card {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .animated-card.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Add this to your <style> section */
+        #typing-name::after {
+            content: '|';
+            animation: blink 1s steps(1) infinite;
+            color: #3498db;
+            margin-left: 2px;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0);}
+            50% { transform: translateY(-10px);}
+        }
+        .group-hover\:animate-bounce:hover img,
+        .group:hover .group-hover\:animate-bounce {
+            animation: bounce 0.5s;
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+            100% { transform: translateY(0px); }
+        }
+        .animate-float {
+            animation: float 2s ease-in-out infinite;
+        }
+        @keyframes glow {
+            0% { filter: drop-shadow(0 0 4px rgba(255,255,255,0.8)); }
+            50% { filter: drop-shadow(0 0 12px rgba(255,255,255,1)); }
+            100% { filter: drop-shadow(0 0 4px rgba(255,255,255,0.8)); }
+        }
+        .animate-glow {
+            animation: glow 1.5s ease-in-out infinite;
+        }
+        /* Custom styles for rendered markdown content in chat */
+        .prose {
+            /* Basic styling for markdown elements if @tailwindcss/typography is not used */
+            max-width: 100%; /* Ensure content doesn't overflow */
+        }
+        .prose p {
+            margin-bottom: 0.5em;
+        }
+        .prose ul, .prose ol {
+            padding-left: 1.5em;
+            margin-bottom: 0.5em;
+        }
+        .prose li {
+            margin-bottom: 0.25em;
+        }
+        .prose strong {
+            font-weight: bold;
+        }
+
+        /* Parallax specific styles */
+        .parallax-section {
+            position: relative;
+            overflow: hidden;
+            /* Ensure the section has a defined height, or content fills it */
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding-top: 2rem; /* Add padding to prevent content from touching top */
+            padding-bottom: 2rem; /* Add padding to prevent content from touching bottom */
+            background-color: rgba(0,0,0,0.4); /* Darker overlay for better contrast */
+            border-radius: 1.5rem; /* Match card border radius */
+            margin-bottom: 2rem; /* Add space between sections */
+            box-shadow: 0 10px 32px 0 rgba(0, 0, 0, 0.25);
+        }
+
+        .parallax-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            /* Will be dynamically adjusted by JavaScript */
+            will-change: transform; /* Optimize for animation */
+            z-index: -1; /* Place behind content */
+            filter: brightness(0.7); /* Slightly dim the background image */
+        }
+        .parallax-content {
+            position: relative;
+            z-index: 1; /* Ensure content is above the background */
+            text-align: center;
+            color: white; /* Example: make content visible over background */
+            padding: 2rem;
+            /* background-color: rgba(0,0,0,0.3); -- Removed, parallax-section already has overlay */
+            border-radius: 1rem;
+            max-width: 90%; /* Ensure content doesn't overflow */
+        }
+
+        /* Adjust text colors for readability on dark background */
+        .text-gray-700 { color: #d1d5db !important; } /* Set to light white color as requested, with !important */
+        .text-gray-600 { color: #f9fafb; } /* Pure white */
+        .text-gray-500 { color: #9ca3af; } /* Slightly darker light gray */
+        .text-blue-600 { color: #3498db; } /* Keep blue accent */
+        .text-purple-600 { color: #9B59B6; } /* Adjust purple accent */
+
+
+        /* Navbar adjustment */
+        header {
+            background-color: rgba(13, 17, 23, 0.8); /* Semi-transparent dark header */
+            backdrop-filter: blur(10px); /* Blur effect */
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        header nav a {
+            color: #d1d5db; /* Light gray for nav links */
+            transition: color 0.3s ease-in-out, transform 0.2s ease-in-out; /* Add transform for subtle lift */
+        }
+        header nav a:hover {
+            color: #3498db; /* Blue on hover */
+            transform: translateY(-2px); /* Subtle lift on hover */
+        }
+        #mobile-menu {
+            background-color: rgba(13, 17, 23, 0.95);
+        }
+        #mobile-menu a {
+            color: #d1d5db;
+        }
+
+        /* AI Chat button */
+        #ai-assistant-button {
+            box-shadow: 0 0 32px 8px #a855f7, 0 4px 32px 0 #0ea5e9; /* Adjusted glow colors */
+        }
+
+        /* AI Chat window */
+        #ai-assistant-chat {
+            background-color: rgba(13, 17, 23, 0.8); /* Darker, more transparent chat window */
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            color: #e0e0e0;
+        }
+        #ai-assistant-chat .bg-blue-600 { /* Chat header */
+            background-color: #3498db;
+        }
+        #chat-messages .bg-gray-200 { /* AI message bubble */
+            background-color: rgba(255, 255, 255, 0.15); /* Semi-transparent light */
+            color: #e0e0e0;
+        }
+        #chat-messages .bg-blue-500 { /* User message bubble */
+            background-color: #3498db;
+        }
+        #user-input {
+            background-color: rgba(255, 255, 255, 0.1); /* Semi-transparent input */
+            border-color: rgba(255,255,255,0.2);
+            color: #e0e0e0;
+        }
+        #user-input::placeholder {
+            color: #9ca3af;
+        }
+        #user-input:focus {
+            border-color: #3498db;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #1a202c; /* Slightly lighter dark for footer */
+            color: #d1d5db;
+        }
+
+        /* Ensure hero image has rounded corners to fit overall theme */
+        #about img {
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 32px 0 rgba(0, 0, 0, 0.25);
+        }
+        /* Specific override for hero h1 text to be pure white */
+        #about h1 {
+            color: #f9fafb !important; /* Force pure white for "Hey, I'm" */
+        }
+
+        /* Hologram Animation for Project and Certification Cards */
+        #projects .card:hover,
+        #certifications .card:hover {
+            /* Removed animation property */
+            /* Preserve existing transforms and add new shadow */
+            transform: translateY(-8px) scale(1.03); /* Existing hover effect */
+            box-shadow: 0 20px 40px 0 rgba(52, 152, 219, 0.25); /* Revert to default card hover shadow */
+            filter: none; /* Remove any brightness/hue-rotate filter */
+        }
+
+        /* Removed @keyframes hologram-pulse */
+
+    </style>
+</head>
+<body class="antialiased leading-relaxed">
+    <!-- Loading Screen Overlay -->
+    <div id="loading-screen">
+        <div class="flower-loader">
+            <div class="petal"></div>
+            <div class="petal" style="transform: rotate(72deg); background-color: #8e44ad;"></div>
+            <div class="petal" style="transform: rotate(144deg); background-color: #2ecc71;"></div>
+            <div class="petal" style="transform: rotate(216deg); background-color: #e67e22;"></div>
+            <div class="petal" style="transform: rotate(288deg); background-color: #f1c40f;"></div>
+            <div class="center"></div>
+        </div>
+        <div class="loading-text">Loading Portfolio...</div>
+    </div>
+
+    <!-- Animated background gradient layer -->
+    <div class="animated-bg-gradient"></div>
+    <!-- Particles.js background layer -->
+    <div id="tsparticles"></div>
+
+    <header class="shadow-sm py-4 sticky top-0 z-50">
+        <nav class="container mx-auto px-4 flex justify-between items-center">
+            <a href="#" class="text-2xl font-bold text-blue-600">YASH VERMA</a>
+            <div class="space-x-6 hidden md:flex">
+                <a href="#about" class="hover:text-blue-600 transition duration-300">About</a>
+                <a href="#education" class="hover:text-blue-600 transition duration-300">Education</a>
+                <a href="#projects" class="hover:text-blue-600 transition duration-300">Projects</a>
+                <a href="#skills" class="hover:text-blue-600 transition duration-300">Skills</a>
+                <a href="#certifications" class="hover:text-blue-600 transition duration-300">Certifications</a>
+                <a href="#ask-me-anything-form" class="hover:text-blue-600 transition duration-300">Ask Me</a>
+                <a href="#contact" class="hover:text-blue-600 transition duration-300">Contact</a>
+            </div>
+            <button id="mobile-menu-button" class="md:hidden focus:outline-none">
+                <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                </svg>
+            </button>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden fixed inset-0 bg-opacity-95 z-40 flex flex-col items-center justify-center space-y-8 text-xl">
+            <button id="close-mobile-menu" class="absolute top-4 right-4 text-gray-700 focus:outline-none">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+            <a href="#about" class="hover:text-blue-600 transition duration-300" onclick="document.getElementById('mobile-menu').classList.add('hidden')">About</a>
+            <a href="#education" class="hover:text-blue-600 transition duration-300" onclick="document.getElementById('mobile-menu').classList.add('hidden')">Education</a>
+            <a href="#projects" class="hover:text-blue-600 transition duration-300" onclick="document.getElementById('mobile-menu').classList.add('hidden')">Projects</a>
+            <a href="#skills" class="hover:text-blue-600 transition duration-300" onclick="document.getElementById('mobile-menu').classList.add('hidden')">Skills</a>
+            <a href="#certifications" class="hover:text-blue-600 transition duration-300" onclick="document.getElementById('mobile-menu').classList.add('hidden')">Certifications</a>
+            <a href="#ask-me-anything-form" class="hover:text-blue-600 transition duration-300" onclick="document.getElementById('mobile-menu').classList.add('hidden')">Ask Me</a>
+            <a href="#contact" class="hover:text-blue-600 transition duration-300" onclick="document.getElementById('mobile-menu').classList.add('hidden')">Contact</a>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8 md:py-16">
+        <section id="about" class="flex flex-col md:flex-row items-center justify-center text-center md:text-left min-h-screen-75 py-12 md:py-0">
+            <div class="md:w-1/2 order-2 md:order-1 mt-8 md:mt-0 hero-text-animate">
+                <h1 class="text-5xl md:text-6xl font-extrabold text-gray-600 mb-2 leading-tight">
+                    Hey, I'm
+                </h1>
+                <h2 class="text-5xl md:text-6xl font-extrabold text-blue-600 mb-4 leading-tight">
+                    <span id="typing-name"></span>
+                </h2>
+                <p class="text-xl md:text-2xl text-gray-600 mb-8 max-w-2xl mx-auto md:mx-0">
+                    A passionate and driven individual with a keen interest in web development,
+                    problem-solving, and creating impactful digital experiences.
+                </p>
+                <div class="flex flex-col sm:flex-row justify-center md:justify-start space-y-4 sm:space-y-0 sm:space-x-4">
+                    <a href="#projects" class="btn-primary inline-block text-center">View My Work</a>
+                    <!-- Removed Get In Touch button from here, as the whole section is moved -->
+                </div>
+            </div>
+            <div class="md:w-1/2 order-1 md:order-2 flex justify-center md:justify-end hero-image-animate">
+                <img src="YASH.jpg" alt="Yash Verma Profile" class="">
+            </div>
+        </section>
+
+        <section id="education" class="py-16 fade-in-section parallax-section">
+            <div class="parallax-background" style="background-image: url('https://images.unsplash.com/photo-1541339907198-e087ec8d53bc?fit=crop&w=1400&q=80');"></div>
+            <div class="parallax-content w-full">
+                <h2 class="section-heading mx-auto md:mx-0 text-center md:text-left text-white">My Education</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
+                    <div class="card animated-card">
+                        <h3 class="text-2xl font-semibold text-white mb-2">Bachelor of Computer Application (BCA)</h3>
+                        <p class="text-blue-600 text-lg mb-1">DAYANAND ACADEMY OF MANAGEMENT STUDIES (DAMS)</p>
+                        <p class="text-gray-500 mb-4">2021 - 2024 </p>
+                        <p class="text-gray-700">
+                            Focused on Computer Application including Programming Language, SQL, CLOUD and academic projects
+                            Engaged in extracurricular activities and leadership roles.
+                        </p>
+                    </div>
+                    <div class="card animated-card" style="transition-delay: 0.1s;">
+                        <h3 class="text-2xl font-semibold text-white mb-2">Intermediate </h3>
+                        <p class="text-blue-600 text-lg mb-1">Siddharth Public School</p>
+                        <p class="text-gray-500 mb-4">2020 - 2021</p>
+                        <p class="text-gray-700">
+                            Completed secondary education with a strong emphasis on Science and Mathematics.
+                            Engaged in extracurricular activities and leadership roles.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="projects" class="py-16 fade-in-section parallax-section">
+            <div class="parallax-background" style="background-image: url('https://images.unsplash.com/photo-1510519129531-ec7b4f514b18?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');"></div>
+            <div class="parallax-content w-full">
+                <h2 class="section-heading mx-auto md:mx-0 text-center md:text-left text-white">My Projects</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
+                    <div class="card animated-card">
+                        <div class="flex items-center mb-4">
+                            <span class="inline-flex items-center justify-center bg-blue-100 rounded-full w-20 h-20 mr-5">
+                                <svg class="w-12 h-12 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <rect x="4" y="4" width="16" height="16" rx="4" stroke="currentColor" />
+                                    <circle cx="12" cy="10" r="3" stroke="currentColor" />
+                                    <path stroke="currentColor" d="M8 16c0-2.21 3.58-2.21 3.58 0M16 16c0-2.21-3.58-2.21-3.58 0" />
+                                </svg>
+                            </span>
+                            <h3 class="text-2xl font-semibold text-white">Employee Profile System</h3>
+                        </div>
+                        <p class="text-gray-700 mb-4">
+                            A serverless Employee Profile System built using AWS services (Lambda, S3, DynamoDB). Enables storing, updating, and fetching employee information securely from anywhere, without the need for traditional servers or maintenance.
+                        </p>
+                        <div class="flex space-x-4">
+                            <a href="https://github.com/yourusername/employee-profile-system" target="_blank" class="text-blue-600 hover:underline font-medium flex items-center">
+                                <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                                Code
+                            </a>
+                            <a href="#" target="_blank" class="text-blue-600 hover:underline font-medium flex items-center">
+                                <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                                Live Demo
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="card animated-card">
+                        <div class="flex items-center mb-4">
+                            <span class="inline-flex items-center justify-center bg-purple-100 rounded-full w-20 h-20 mr-5">
+                                <svg class="w-12 h-12 text-purple-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <rect x="4" y="7" width="16" height="10" rx="5" stroke="currentColor" fill="#ede9fe"/>
+                                    <circle cx="9" cy="12" r="1.5" fill="currentColor"/>
+                                    <circle cx="15" cy="12" r="1.5" fill="currentColor"/>
+                                    <rect x="11" y="4" width="2" height="3" rx="1" fill="currentColor"/>
+                                    <rect x="11" y="17" width="2" height="3" rx="1" fill="currentColor"/>
+                                </svg>
+                            </span>
+                            <h3 class="text-2xl font-semibold text-white">Self Portfolio with AI</h3>
+                        </div>
+                        <p class="text-gray-700 mb-4">
+                            This is my personal portfolio website featuring an integrated AI assistant. Visitors can explore my skills, projects, and certifications, and also chat with an AI chatbot for instant answers about my experience and expertise. The AI assistant makes the site interactive and helps users quickly find information about me.
+                        </p>
+                        <div class="flex space-x-4">
+                            <a href="https://github.com/yourusername/self-portfolio-ai" target="_blank" class="text-blue-600 hover:underline font-medium flex items-center">
+                                <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                                Code
+                            </a>
+                            <a href="#" target="_blank" class="text-blue-600 hover:underline font-medium flex items-center">
+                                <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                                Live Demo
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="skills" class="py-16 fade-in-section">
+            <h2 class="section-heading mx-auto md:mx-0 text-center md:text-left">My Skills</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-8">
+                <div class="card animated-card flex items-center group transition-transform duration-300 hover:scale-105 hover:shadow-2xl cursor-pointer">
+                    <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/python.svg" alt="Python" class="w-8 h-8 mr-3 flex-shrink-0 group-hover:animate-bounce">
+                    <span class="text-lg font-medium text-white">Python</span>
+                </div>
+                <div class="card animated-card flex items-center group transition-transform duration-300 hover:scale-105 hover:shadow-2xl cursor-pointer" style="transition-delay: 0.05s;">
+                    <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/cloudflare.svg" alt="Cloud Computing" class="w-8 h-8 mr-3 flex-shrink-0 group-hover:animate-bounce">
+                    <span class="text-lg font-medium text-white">Cloud Computing</span>
+                </div>
+                <div class="card animated-card flex items-center group transition-transform duration-300 hover:scale-105 hover:shadow-2xl cursor-pointer" style="transition-delay: 0.05s;">
+                    <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/amazonaws.svg" alt="AWS" class="w-8 h-8 mr-3 flex-shrink-0 group-hover:animate-bounce">
+                    <span class="text-lg font-medium text-white">AWS</span>
+                </div>
+                <div class="card animated-card flex items-center group transition-transform duration-300 hover:scale-105 hover:shadow-2xl cursor-pointer" style="transition-delay: 0.05s;">
+                    <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/googlecloud.svg" alt="Google Cloud Platform" class="w-8 h-8 mr-3 flex-shrink-0 group-hover:animate-bounce">
+                    <span class="text-lg font-medium text-white">Google Cloud Platform</span>
+                </div>
+                <div class="card animated-card flex items-center group transition-transform duration-300 hover:scale-105 hover:shadow-2xl cursor-pointer" style="transition-delay: 0.05s;">
+                    <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/microsoftexcel.svg" alt="Excel" class="w-8 h-8 mr-3 flex-shrink-0 group-hover:animate-bounce">
+                    <span class="text-lg font-medium text-white">Excel</span>
+                </div>
+                <div class="card animated-card flex items-center group transition-transform duration-300 hover:scale-105 hover:shadow-2xl cursor-pointer" style="transition-delay: 0.05s;">
+                    <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/html5.svg" alt="HTML5" class="w-8 h-8 mr-2 flex-shrink-0 group-hover:animate-bounce">
+                    <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/css3.svg" alt="CSS3" class="w-8 h-8 mr-3 flex-shrink-0 group-hover:animate-bounce">
+                    <span class="text-lg font-medium text-white">HTML &amp; CSS</span>
+                </div>
+                <div class="card animated-card flex items-center group transition-transform duration-300 hover:scale-105 hover:shadow-2xl cursor-pointer" style="transition-delay: 0.05s">
+                    <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/leetcode.svg" alt="Problem Solving" class="w-8 h-8 mr-3 flex-shrink-0 group-hover:animate-bounce">
+                    <span class="text-lg font-medium text-white">Problem Solving</span>
+                </div>
+            </div>
+        </section>
+
+        <section id="certifications" class="py-16 fade-in-section parallax-section">
+            <div class="parallax-background" style="background-image: url('https://images.unsplash.com/photo-1522204523234-8729aa6e993f?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');"></div>
+            <div class="parallax-content w-full">
+                <h2 class="section-heading mx-auto md:mx-0 text-center md:text-left text-white">My Certifications</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
+                    <div class="card animated-card certification-popup transition-transform duration-300"style="transition-delay: 0.01s;">
+                        <h3 class="text-2xl font-semibold text-white mb-2">Python Programming Certification</h3>
+                        <p class="text-blue-600 text-lg mb-1">SKDeft Technologies</p>
+                        <p class="text-gray-500 mb-4">Issued: Aug 2022</p>
+                        <p class="text-gray-700">
+                            Gained proficiency in Python basic to intermediate.
+                        </p>
+                    </div>
+                    <div class="card animated-card certification-popup transition-transform duration-300" style="transition-delay: 0.01s;">
+                        <h3 class="text-2xl font-semibold text-white mb-2">Cloud Computing</h3>
+                        <p class="text-blue-600 text-lg mb-1">SKDeft Technologies</p>
+                        <p class="text-gray-500 mb-4">Issued: Aug 2023</p>
+                        <p class="text-gray-700">
+                            Learned AWS (Amazon Web Services) and built a major project using AWS services.
+                        </p>
+                    </div>
+                    <div class="card animated-card certification-popup transition-transform duration-300" style="transition-delay: 0.01s;">
+                        <h3 class="text-2xl font-semibold text-white mb-2">Excel Basic</h3>
+                        <p class="text-blue-600 text-lg mb-1">Linkedin Learning</p>
+                        <p class="text-gray-500 mb-4">Issued: March 2025</p>
+                        <p class="text-gray-700">
+                            Learned basic tutorial of Excel.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- New section for Ask Me Anything form -->
+        <section id="ask-me-anything-form" class="py-16 fade-in-section">
+            <div class="container mx-auto px-4">
+                <h2 class="section-heading mx-auto md:mx-0 text-center md:text-left text-white">Ask Me Anything!</h2>
+                <p class="text-xl text-gray-700 mb-6 max-w-2xl mx-auto text-center">
+                    Have a question about my projects, skills, or anything else about me? Send it here!
+                </p>
+
+                <form id="questionForm" class="max-w-xl mx-auto card animated-card p-8">
+                    <div class="mb-4">
+                        <label for="question" class="block text-gray-200 text-left text-sm font-bold mb-2">Your Question:</label>
+                        <textarea id="question" name="question" rows="5" class="shadow-sm appearance-none border border-white/20 bg-white/10 rounded w-full py-2 px-3 text-white leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400" placeholder="Type your question here..." required></textarea>
+                    </div>
+                    <div class="mb-6">
+                        <label for="email" class="block text-gray-200 text-left text-sm font-bold mb-2">Your Email (Optional):</label>
+                        <input type="email" id="email" name="email" class="shadow-sm appearance-none border border-white/20 bg-white/10 rounded w-full py-2 px-3 text-white leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400" placeholder="Enter your email here...">
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <button type="submit" class="btn-primary">
+                            Send Question
+                        </button>
+                    </div>
+                    <p id="formMessage" class="mt-4 text-center text-sm"></p>
+                </form>
+            </div>
+        </section>
+        <!-- End New section for Ask Me Anything form -->
+
+        <section id="contact" class="py-16 fade-in-section">
+            <div class="container mx-auto px-4">
+                <h2 class="section-heading mx-auto md:mx-0 text-center md:text-left">Get In Touch</h2>
+                <div class="card mt-8 text-center animated-card">
+                    <p class="text-xl text-white mb-6">
+                        Feel free to connect with me on social media or send me an email!
+                    </p>
+                    <div class="flex justify-center space-x-6 mb-8 social-icons-container">
+                        <a href="https://linkedin.com/in/fameisyash" target="_blank" class="social-icon" aria-label="LinkedIn">
+                            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/linkedin.svg" alt="LinkedIn" class="w-6 h-6">
+                        </a>
+                        <a href="https://github.com/fameisyash" target="_blank" class="social-icon" aria-label="GitHub">
+                            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/github.svg" alt="GitHub" class="w-6 h-6">
+                        </a>
+                        <a href="mailto:techwithyashverma@gmail.com" class="social-icon" aria-label="Email">
+                            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/gmail.svg" alt="Email" class="w-6 h-6">
+                        </a>
+                        <a href="https://twitter.com/fameisyash" target="_blank" class="social-icon" aria-label="Twitter">
+                            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/twitter.svg" alt="Twitter" class="w-6 h-6">
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white py-8 mt-12">
+        <div class="container mx-auto px-4 text-center">
+            <p>&copy; 2025 YASH VERMA. All rights reserved.</p>
+            <p class="text-sm mt-2">Built by Yash ❤️.</p>
+        </div>
+    </footer>
+
+    <button id="ai-assistant-button"
+    class="fixed bottom-6 right-6 bg-gradient-to-br from-purple-500 via-blue-500 to-cyan-400 text-white p-4 rounded-full shadow-2xl focus:outline-none transition-transform duration-300 ease-in-out hover:scale-110 z-50 border-4 border-white ring-4 ring-blue-300 ring-opacity-40 animate-float"
+    aria-label="Open AI Assistant"
+    style="box-shadow: 0 0 32px 8px #a855f7, 0 4px 32px 0 #0ea5e9;">
+    <span class="relative flex items-center justify-center">
+        <svg class="w-10 h-10 text-white drop-shadow-lg animate-glow" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <rect x="4" y="7" width="16" height="10" rx="5" stroke="currentColor" fill="#6366f1"/>
+            <circle cx="9" cy="12" r="1.5" fill="#fff"/>
+            <circle cx="15" cy="12" r="1.5" fill="#fff"/>
+            <rect x="11" y="4" width="2" height="3" rx="1" fill="#fff"/>
+            <rect x="11" y="17" width="2" height="3" rx="1" fill="#fff"/>
+        </svg>
+        <span class="absolute inline-flex h-full w-full rounded-full bg-gradient-to-br from-blue-400 to-purple-500 opacity-60 animate-ping"></span>
+    </span>
+</button>
+
+    <div id="ai-assistant-chat" class="hidden fixed bottom-20 right-6 w-80 sm:w-96 max-w-full bg-white rounded-lg shadow-xl z-50 flex flex-col h-[28rem] sm:h-[32rem]">
+        <div class="bg-blue-600 text-white p-3 rounded-t-lg flex justify-between items-center">
+            <h3 class="font-semibold text-lg">Yash's AI Assistant</h3>
+            <button id="close-ai-chat" class="text-white hover:text-gray-200 focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+        <div id="chat-messages" class="p-4 flex-grow overflow-y-auto space-y-3">
+            <div class="flex">
+                <div class="bg-gray-200 text-gray-800 p-3 rounded-lg max-w-xs mr-auto">
+                    <p class="text-sm">Hello! I'm Yash's AI assistant. How can I help you today regarding Yash's portfolio or skills?</p>
+                </div>
+            </div>
+        </div>
+        <div class="p-3 border-t flex items-center">
+            <input type="text" id="user-input" placeholder="Ask something..." class="w-full p-2 border rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400" placeholder="Ask something..." required></textarea>
+            <button id="send-button" class="bg-blue-600 text-white p-2 rounded-r-md hover:bg-blue-700 focus:outline-none">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetElement = document.querySelector(this.getAttribute('href'));
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Mobile menu toggle
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const closeMobileMenuButton = document.getElementById('close-mobile-menu');
+
+        if (mobileMenuButton && mobileMenu && closeMobileMenuButton) {
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.remove('hidden');
+            });
+
+            closeMobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+            });
+
+            // Close mobile menu when a link is clicked
+            mobileMenu.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                });
+            });
+        }
+
+        // Intersection Observer for fade-in animations
+        const fadeInSections = document.querySelectorAll('.fade-in-section');
+        const animatedCards = document.querySelectorAll('.animated-card');
+        const sectionHeadings = document.querySelectorAll('.section-heading');
+
+        const observerOptions = {
+            root: null, // viewport
+            rootMargin: '0px',
+            threshold: 0.1 // 10% of the element must be visible
+        };
+
+        const observerCallback = (entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    observer.unobserve(entry.target); // Stop observing once visible
+                }
+            });
+        };
+
+        const observer = new IntersectionObserver(observerCallback, observerOptions);
+
+        fadeInSections.forEach(section => {
+            observer.observe(section);
+        });
+
+        animatedCards.forEach(card => {
+            observer.observe(card);
+        });
+
+        sectionHeadings.forEach(heading => {
+            observer.observe(heading);
+        });
+
+        // Typing animation for name in hero section
+        document.addEventListener('DOMContentLoaded', function () {
+            const name = "YASH VERMA";
+            const typingSpan = document.getElementById('typing-name');
+            let i = 0;
+            function type() {
+                if (typingSpan && i <= name.length) {
+                    typingSpan.textContent = name.slice(0, i);
+                    i++;
+                    setTimeout(type, 120);
+                }
+            }
+            type();
+        });
+
+        // AI Assistant Chatbot Functionality
+        const aiAssistantButton = document.getElementById('ai-assistant-button');
+        const aiAssistantChat = document.getElementById('ai-assistant-chat');
+        const closeAiChatButton = document.getElementById('close-ai-chat');
+        const chatMessages = document.getElementById('chat-messages');
+        const userInput = document.getElementById('user-input');
+        const sendButton = document.getElementById('send-button');
+
+        // Initialize chat history with the AI's initial greeting
+        let chatHistory = [{ role: "model", parts: [{ text: "Hello! I'm Yash's AI assistant. How can I help you today regarding Yash's portfolio or skills?" }] }];
+
+        // Toggle AI chat window visibility
+        if (aiAssistantButton && aiAssistantChat && closeAiChatButton) {
+            aiAssistantButton.addEventListener('click', () => {
+                aiAssistantChat.classList.toggle('hidden');
+                if (!aiAssistantChat.classList.contains('hidden')) {
+                    chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll to bottom on open
+                }
+            });
+
+            closeAiChatButton.addEventListener('click', () => {
+                aiAssistantChat.classList.add('hidden');
+            });
+        }
+
+        // Function to add a message to the chat window
+        function addMessage(sender, text) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('flex');
+            if (sender === 'user') {
+                messageDiv.classList.add('justify-end');
+                messageDiv.innerHTML = `
+                    <div class="bg-blue-500 text-white p-3 rounded-lg max-w-xs ml-auto">
+                        <p class="text-sm">${text}</p>
+                    </div>
+                `;
+            } else {
+                messageDiv.classList.add('justify-start');
+                // Use marked.parse() to convert Markdown to HTML
+                const formattedText = marked.parse(text);
+                messageDiv.innerHTML = `
+                    <div class="bg-gray-200 text-gray-800 p-3 rounded-lg max-w-xs mr-auto">
+                        <div class="text-sm prose">${formattedText}</div>
+                    </div>
+                `;
+            }
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight; // Auto-scroll to the latest message
+        }
+
+        // Function to gather portfolio data
+        function getPortfolioData() {
+            const data = {};
+
+            // Education
+            const educationEntries = [];
+            document.querySelectorAll('#education .card').forEach(card => {
+                const degree = card.querySelector('h3')?.textContent.trim();
+                const institution = card.querySelector('p:nth-of-type(1)')?.textContent.trim();
+                const years = card.querySelector('p:nth-of-type(2)')?.textContent.trim();
+                const description = card.querySelector('p:nth-of-type(3)')?.textContent.trim();
+                if (degree && institution && years) {
+                    educationEntries.push({ degree, institution, years, description });
+                }
+            });
+            data.education = educationEntries;
+
+            // Projects
+            const projectEntries = [];
+            document.querySelectorAll('#projects .card').forEach(card => {
+                const title = card.querySelector('h3')?.textContent.trim();
+                const description = card.querySelector('p')?.textContent.trim();
+                const codeLink = card.querySelector('a[href*="github.com"]')?.href;
+                const liveDemoLink = card.querySelector('a:not([href*="github.com"])')?.href;
+                if (title && description) {
+                    projectEntries.push({ title, description, codeLink, liveDemoLink });
+                }
+            });
+            data.projects = projectEntries;
+
+            // Skills
+            const skillEntries = [];
+            document.querySelectorAll('#skills .card span').forEach(span => {
+                skillEntries.push(span.textContent.trim());
+            });
+            data.skills = skillEntries;
+
+            // Certifications
+            const certificationEntries = [];
+            document.querySelectorAll('#certifications .card').forEach(card => {
+                const title = card.querySelector('h3')?.textContent.trim();
+                const issuer = card.querySelector('p:nth-of-type(1)')?.textContent.trim();
+                const issuedDate = card.querySelector('p:nth-of-type(2)')?.textContent.trim();
+                const description = card.querySelector('p:nth-of-type(3)')?.textContent.trim();
+                if (title && issuer && issuedDate) {
+                    certificationEntries.push({ title, issuer, issuedDate, description });
+                }
+            });
+            data.certifications = certificationEntries;
+
+            return data;
+        }
+
+        // Function to send message to Gemini API with retry logic
+        async function sendMessageToGemini(prompt) {
+            addMessage('user', prompt); // Display user's message immediately
+            userInput.value = ''; // Clear input field
+
+            const loadingDiv = document.createElement('div');
+            loadingDiv.classList.add('flex', 'justify-start');
+            chatMessages.appendChild(loadingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            // Retry parameters
+            let maxRetries = 3;
+            let retryDelayMs = 1000; // 1 second initial delay
+
+            // Get portfolio data
+            const portfolioData = getPortfolioData();
+
+            // Construct a system instruction or prepend to the user's message
+            const systemInstruction = `You are an AI assistant for Yash Verma's portfolio. Your goal is to answer questions about Yash based ONLY on the provided portfolio data. Do not invent information. If you cannot answer a question based on the provided data, politely state that.
+
+            **Always provide answers in a concise, clear, and easy-to-understand manner.** Use bullet points or numbered lists for key information when appropriate. Avoid overly technical jargon unless specifically asked. Make your responses engaging and directly address the user's question.
+
+            Here is Yash's portfolio information:
+            Education: ${JSON.stringify(portfolioData.education, null, 2)}
+            Projects: ${JSON.stringify(portfolioData.projects, null, 2)}
+            Skills: ${JSON.stringify(portfolioData.skills, null, 2)}
+            Certifications: ${JSON.stringify(portfolioData.certifications, null, 2)}
+
+            Now, answer the user's question based on the above information.`;
+
+            const conversationTurn = {
+                role: "user",
+                parts: [{ text: `${systemInstruction}\n\nUser's question: ${prompt}` }]
+            };
+
+            const currentChatHistory = [conversationTurn]; // Send only the current turn with context
+
+            for (let i = 0; i < maxRetries; i++) {
+                loadingDiv.innerHTML = `
+                    <div class="bg-gray-200 text-gray-800 p-3 rounded-lg max-w-xs mr-auto">
+                        <p class="text-sm">${i === 0 ? 'Typing...' : `Retrying (${i + 1}/${maxRetries})...`}</p>
+                    </div>
+                `;
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+
+                try {
+                    const payload = { contents: currentChatHistory };
+                    const apiKey = "AIzaSyALpZuta3yBsQZhTkrOtxLG47dxE9SzWqc"; // Keep API key empty as it's handled by Canvas runtime
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload),
+                        signal: controller.signal // Apply the timeout signal
+                    });
+
+                    clearTimeout(timeoutId); // Clear timeout if response received in time
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        // Check for retryable status codes (e.g., 503 Service Unavailable, 429 Too Many Requests)
+                        if (response.status === 503 || response.status === 429) {
+                            console.warn(`API call failed with status ${response.status}. Retrying in ${retryDelayMs}ms...`);
+                            await new Promise(resolve => setTimeout(resolve, retryDelayMs));
+                            retryDelayMs *= 2; // Exponential backoff
+                            continue; // Try again
+                        } else {
+                            throw new Error(`API error: ${response.status} ${response.statusText} - ${JSON.stringify(errorData)}`);
+                        }
+                    }
+
+                    const result = await response.json();
+
+                    // Remove loading indicator
+                    chatMessages.removeChild(loadingDiv);
+
+                    if (result.candidates && result.candidates.length > 0 &&
+                        result.candidates[0].content && result.candidates[0].content.parts &&
+                        result.candidates[0].content.parts.length > 0) {
+                        const aiResponse = result.candidates[0].content.parts[0].text;
+                        addMessage('ai', aiResponse);
+                        chatHistory.push({ role: "model", parts: [{ text: aiResponse }] });
+                        return; // Successfully received response, exit function
+                    } else {
+                        addMessage('ai', "Sorry, I couldn't get a valid response from the AI. Please try again. Check console for details.");
+                        console.error("Unexpected API response structure:", result);
+                        return; // Exit after unexpected structure
+                    }
+                } catch (error) {
+                    if (error.name === 'AbortError') {
+                        console.warn("API call timed out. Retrying...");
+                        // This counts as a retryable error for our purpose
+                        await new Promise(resolve => setTimeout(resolve, retryDelayMs));
+                        retryDelayMs *= 2;
+                        continue;
+                    } else {
+                        // For non-retryable errors, remove loading and show message then exit
+                        chatMessages.removeChild(loadingDiv);
+                        addMessage('ai', `Oops! Something went wrong. Please check your browser's console for more details. Error: ${error.message}`);
+                        console.error("Error calling Gemini API:", error);
+                        return;
+                    }
+                }
+            }
+            // If loop finishes, all retries failed
+            chatMessages.removeChild(loadingDiv);
+            addMessage('ai', "Sorry, the AI assistant is currently unavailable after multiple retries. Please try again later.");
+            console.error("All API retries failed.");
+        }
+
+        // Event listener for send button click (AI Assistant)
+        if (sendButton && userInput) {
+            sendButton.addEventListener('click', () => {
+                const message = userInput.value.trim();
+                if (message) {
+                    sendMessageToGemini(message);
+                }
+            });
+
+            // Event listener for Enter key press in input field (AI Assistant)
+            userInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    const message = userInput.value.trim();
+                    if (message) {
+                        sendMessageToGemini(message);
+                    }
+                }
+            });
+        }
+
+        // Parallax Scrolling Script
+        document.addEventListener('DOMContentLoaded', () => {
+            const parallaxSections = document.querySelectorAll('.parallax-section');
+
+            const applyParallax = () => {
+                parallaxSections.forEach(section => {
+                    const background = section.querySelector('.parallax-background');
+                    if (background) {
+                        const speed = 0.3; // Adjust this value for faster/slower parallax effect
+
+                        const sectionRect = section.getBoundingClientRect();
+                        const scrollPosition = window.pageYOffset;
+
+                        // Calculate how much the background should move relative to its center entering/leaving viewport
+                        // This calculation ensures the effect is more visible as the section scrolls into view
+                        const elementTop = sectionRect.top + scrollPosition;
+                        const elementHeight = section.offsetHeight;
+                        const viewportHeight = window.innerHeight;
+
+                        // Calculate percentage of section visible in viewport
+                        let percentage = 0;
+                        if (elementTop < (scrollPosition + viewportHeight) && (elementTop + elementHeight) > scrollPosition) {
+                            const distanceScrolledIntoElement = scrollPosition + viewportHeight - elementTop;
+                            percentage = distanceScrolledIntoElement / (elementHeight + viewportHeight);
+                        }
+
+                        // Adjust yPos based on percentage for a smoother entry/exit effect
+                        const yPos = (percentage * (elementHeight * speed)) - (elementHeight * speed / 2); // Center movement
+                        background.style.transform = `translateY(${yPos}px)`;
+                    }
+                });
+            };
+
+            // Initial application of parallax
+            applyParallax();
+
+            // Apply parallax on scroll
+            window.addEventListener('scroll', applyParallax);
+
+            // Optional: Re-apply on resize to adjust positions
+            window.addEventListener('resize', applyParallax);
+        });
+
+        // tsparticles initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            tsParticles.load("tsparticles", {
+                "fullScreen": { "enable": false }, // Handled by fixed positioning in CSS
+                "background": {
+                    "color": { "value": "transparent" } // Particles will float over the gradient
+                },
+                "interactivity": {
+                    "events": {
+                        "onHover": {
+                            "enable": true,
+                            "mode": "repulse" // Particles push away on hover
+                        },
+                        "onClick": {
+                            "enable": true,
+                            "mode": "push" // New particles are generated on click
+                        },
+                        "resize": true
+                    },
+                    "modes": {
+                        "repulse": {
+                            "distance": 100,
+                            "duration": 0.4
+                        },
+                        "push": {
+                            "quantity": 4
+                        }
+                    }
+                },
+                "particles": {
+                    "number": {
+                        "value": 80,
+                        "density": {
+                            "enable": true,
+                            "area": 800
+                        }
+                    },
+                    "color": {
+                        "value": ["#ffffff", "#d1d5db", "#9ca3af", "#3498db"] // White, light gray, mid gray, blue
+                    },
+                    "shape": {
+                        "type": "circle"
+                    },
+                    "opacity": {
+                        "value": 0.5,
+                        "random": false,
+                        "anim": {
+                            "enable": false
+                        }
+                    },
+                    "size": {
+                        "value": 3,
+                        "random": true,
+                        "anim": {
+                            "enable": false
+                        }
+                    },
+                    "links": {
+                        "enable": true,
+                        "distance": 150,
+                        "color": "#8b8b8b", // Connecting lines color
+                        "opacity": 0.4,
+                        "width": 1
+                    },
+                    "move": {
+                        "enable": true,
+                        "speed": 1,
+                        "direction": "none",
+                        "random": false,
+                        "straight": false,
+                        "out_mode": "out",
+                        "bounce": false,
+                        "attract": {
+                            "enable": false,
+                            "rotateX": 600,
+                            "rotateY": 1200
+                        }
+                    }
+                },
+                "detectRetina": true
+            });
+        });
+
+
+        // --- New JavaScript for Ask Me Anything Form Submission ---
+        document.getElementById('questionForm').addEventListener('submit', async function(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const formMessage = document.getElementById('formMessage');
+            formMessage.textContent = 'Sending your question...';
+            formMessage.className = 'mt-4 text-center text-sm text-gray-500';
+
+            const question = document.getElementById('question').value;
+            const email = document.getElementById('email').value;
+
+            // IMPORTANT: Replace 'YOUR_BACKEND_API_ENDPOINT' with the actual URL of your deployed Python backend.
+            // During local development, it might be 'http://127.0.0.1:5000/api/questions'
+            // Once deployed, it will be something like 'https://your-flask-app.herokuapp.com/api/questions'
+            const backendUrl = 'http://127.0.0.1:5000/api/questions';
+
+
+
+            try {
+                const response = await fetch(backendUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ question: question, email: email }),
+                });
+
+                if (response.ok) {
+                    // Assuming the backend sends a success message
+                    const result = await response.json();
+                    formMessage.textContent = 'Thank you for your question! I will get back to you soon.';
+                    formMessage.className = 'mt-4 text-center text-sm text-green-600';
+                    document.getElementById('questionForm').reset(); // Clear the form
+                } else {
+                    // Handle errors from the backend
+                    const errorData = await response.json();
+                    formMessage.textContent = `Failed to send question: ${errorData.message || response.statusText}. Please try again.`;
+                    formMessage.className = 'mt-4 text-center text-sm text-red-600';
+                }
+            } catch (error) {
+                console.error('Error submitting form:', error);
+                formMessage.textContent = 'An network error occurred. Please check your connection and try again.';
+                formMessage.className = 'mt-4 text-center text-sm text-red-600';
+            }
+        });
+        // --- End New JavaScript for Ask Me Anything Form Submission ---
+
+        // Hide loading screen after all content (including tsparticles) loads
+        window.addEventListener('load', () => {
+            const loadingScreen = document.getElementById('loading-screen');
+            if (loadingScreen) {
+                loadingScreen.classList.add('hidden'); // Add hidden class to trigger fade out
+                // Optional: Remove element from DOM after transition for cleaner HTML
+                setTimeout(() => loadingScreen.remove(), 1000); // Match CSS transition duration
+            }
+        });
+    </script>
+</body>
+</html>
